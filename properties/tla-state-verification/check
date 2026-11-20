@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+cd "$(dirname "$0")/../.."
+exec java -XX:+UseParallelGC -cp spec/tla2tools.jar tlc2.TLC -nowarning -workers 4 -config spec/ShardSQLiteSmall.cfg spec/ShardSQLite.tla

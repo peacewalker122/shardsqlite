@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+cd "$(dirname "$0")/../.."
+exec go test ./internal/cluster -run '^TestProperty_WALResetPropagation$' -count=1
