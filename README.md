@@ -29,7 +29,7 @@ Only the Raft leader accepts writes. Followers are read-only.
 | `internal/checkpoint` | Manual local checkpoint |
 | `internal/wal` | WAL header, frame, and checksum handling |
 | `cmd/shardsqlited` | Node daemon |
-| `spec` | TLA+ state model and TLC config |
+| `spec` | TLA+ state model, TLC config, and Bend port of the model |
 | `properties` | Trust-gateway property checks |
 
 ## Build and run
@@ -92,6 +92,8 @@ go test ./... -race
 ```
 
 The TLA+ model lives in `spec/ShardSQLite.tla`. The trust-gateway check uses `spec/ShardSQLiteSmall.cfg` with 3 nodes, `MaxLog = 3`, and `MaxPending = 1`. TLC reports no invariant violation in that bounded model. It is not an unbounded proof.
+
+`spec/ShardSQLite.bend` ports the same bounded model to Bend: the same state variables, all `Next` actions, and all 11 invariants. `properties/tla-bend-verification/check` compiles it and explores the reachable state space. Both checkers agree on 399,906 distinct states. `bend spec/ShardSQLite.bend --verdict` also checks the port with Bend's proven kernel.
 
 ## Limits
 

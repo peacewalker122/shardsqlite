@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -eu
+cd "$(dirname "$0")/../.."
+BEND="${BEND:-$HOME/.bend/bin/bend}"
+out="${TMPDIR:-/tmp}/shardsqlite-bend-check"
+"$BEND" spec/ShardSQLite.bend -o "$out"
+exec "$out" +RTS --threads 8

@@ -239,12 +239,15 @@ Implemented and verified by `trust-gateway` properties:
 - `direct-shm-live-apply`: raw WAL frames plus direct `-shm` wal-index update; a long-lived reader sees applied frames without reopening.
 - `restart-recovery`: Raft log store and applied marker survive node restart; committed data still readable.
 - `wal-reset-propagation`: WAL header reset after checkpoint is shipped as a Raft batch; follower salt matches leader and sees post-reset write.
+- `tla-bend-verification`: Bend port of the bounded TLA+ model; exhaustive reachability check agrees with TLC on 399,906 distinct states.
 
-## TLA+ state verification
+## TLA+ and Bend state verification
 
 Bounded TLA+ model in [ShardSQLite.tla](/home/peacewalker/.t3/projects/shardsqlite/spec/ShardSQLite.tla), checked by TLC in property `tla-state-verification`. Bounds: 3 nodes, `MaxLog = 3`, `MaxPending = 1`, one transaction value. State variables cover Raft log, per-node commit/applied store, WAL generation, WAL reset base, WAL image, wal-index `mxFrame`, pending VFS writes, leadership, and snapshot.
 
 Invariants: type bounds, applied never exceeds commit, store covers commit, shm matches applied, pending only on leader, at most one leader, committed entries have quorum, WAL generation matches applied reset count, WAL base matches last applied reset, WAL image matches log prefix, snapshot safe.
+
+`spec/ShardSQLite.bend` ports the same constants, state variables, `Next` actions, and invariants into Bend. Its explorer starts from the port of `Init`, applies every enabled action, and checks all invariants on each newly reached state. The check script compiles with `bend ... -o` and runs the native binary. `bend spec/ShardSQLite.bend --verdict` rechecks the port with Bend's proven kernel.
 
 Resolved decision:
 
